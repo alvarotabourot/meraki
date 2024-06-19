@@ -1,0 +1,22 @@
+{
+    "name": "tabou/cofradia",
+    "autoload": {
+        "psr-4": {
+            "Controllers\\":"./Controllers",
+            "Models\\":"./Models",
+            "Lib\\":"./Lib",
+            "Utils\\":"./Utils"
+        }
+    },
+    "authors": [
+        {
+            "name": "Alvaro",
+            "email": "taboure12@gmail.com"
+        }
+    ],
+    "require": {
+        "vlucas/phpdotenv": "^5.5",
+        "firebase/php-jwt": "^6.4",
+        "phpmailer/phpmailer": "^6.9"
+    }
+}

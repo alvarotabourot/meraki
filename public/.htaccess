@@ -1,0 +1,16 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine on
+
+    # Deshabilitar la indexación de directorios y MultiViews
+    Options -Indexes -MultiViews
+
+    # Establecer un documento de error personalizado para 404 (si tienes uno)
+    ErrorDocument 404 /Error/Index
+
+    # Evitar bucles de reescritura
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Redirigir todas las solicitudes a index.php
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>
