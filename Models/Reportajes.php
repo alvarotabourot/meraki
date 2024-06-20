@@ -41,6 +41,7 @@ class Reportajes extends BaseDatos{
     public function getCategoriaId(){return $this->categoriaId;}
     public function setCategoriaId($categoriaId){$this->categoriaId = $categoriaId;}
 
+    /** FUNCION QUE SIRVE PARA REGISTRAR UN NUEVO REPORTAJE */
     public function registrar($data, $imagen, $idFotografo, $idCategoria){
         $stmt = $this->prepara("INSERT INTO reportajes( nombre, fecha, descripcion, url, usersId, categoriaId) VALUES( :nombre, :fecha, :descripcion, :url, :usersId, :categoriaId);");
         
@@ -59,6 +60,7 @@ class Reportajes extends BaseDatos{
         }
     }
 
+    /** FUNCION QUE DEVUELVE UN REPORTAJE EN CONCRETO */
     public function buscarContenidoReportaje($idReportaje){
         $result = false;
 
@@ -76,6 +78,7 @@ class Reportajes extends BaseDatos{
         return $result;
     }
 
+    /** FUNCION QUE DEVUELVE LAS FOTOGRAFIAS QUE PERTENECEN A UN REPORTAJE EN CONCRETO */
     public function buscarFotosReportaje($idReportaje){
         $result = false;
 
@@ -93,24 +96,7 @@ class Reportajes extends BaseDatos{
         return $result;
     }
 
-    public function buscarNombreFotografo($idFotografo){
-        $result = false;
-
-        $cons = $this->prepara("SELECT * FROM informacionfotografo WHERE userId = :id");
-        $cons->bindParam(':id', $idFotografo, PDO::PARAM_STR);
-
-        try{
-            $cons->execute();
-            if($cons){
-                $result = $cons->fetch(PDO::FETCH_OBJ);
-            }
-        }catch(PDOException $err){
-            $result = false;
-        }
-        return $result;
-
-    }
-
+    /** FUNCION QUE NOS PERMITE SUBIR UNA FOTO A UN REPORTAJE EN CONCRETO */
     public function subirFotoAlReportaje($idReportaje, $nombreImagen){
         $stmt = $this->prepara("INSERT INTO fotosreportajes( url, reportajeId) VALUES( :url, :reportajeId);");
         
@@ -125,6 +111,7 @@ class Reportajes extends BaseDatos{
         }
     }
 
+    /** FUNCION QUE NOS PERMITE MOSTRAR EN EL PERFIL DEL FOTOGRAFO 5 DE SUS REPORTAJES */
     public function buscarReportajes($id){
         $result = false;
 
@@ -143,6 +130,8 @@ class Reportajes extends BaseDatos{
 
     }
 
+    /** FUNCION QUE NOS BUSCA TODOS LOS REPORTAJES DEL USUARIO (SERÁ UTILIZADO PARA BORRAR LOS REGISTROS SI SE BORRA EL FOTOGRAFO) */
+
     public function buscarReportajesFotografo($idFotografo){
         $result = false;
 
@@ -160,6 +149,7 @@ class Reportajes extends BaseDatos{
         return $result;
     }
 
+    /** FUNCION QUE NOS BUSCA TODAS LAS FOTOS DE LOS REPORTAJES DEL USUARIO (SERÁ UTILIZADO PARA BORRAR LOS REGISTROS SI SE BORRA EL FOTOGRAFO) */
     public function buscarFotosFotografo($idReportaje){
         $result = false;
 
@@ -177,6 +167,7 @@ class Reportajes extends BaseDatos{
         return $result;
     }
 
+    /** FUNCION QUE BORRA LAS FOTOS DE LOS REPORTAJES DEL FOTOGRAFO */
     public function borrarFotosReportajesFotografo($idReportaje){
         $cons = $this->prepara("DELETE FROM fotosreportajes WHERE reportajeId = :reportajeId");
         $cons->bindParam(':reportajeId', $idReportaje, PDO::PARAM_INT);
@@ -189,4 +180,22 @@ class Reportajes extends BaseDatos{
         }
     }
 
+    /** FUNCION QUE DEVUELVE EL OBJETO FOTOGRAFO PASANDOLE EL ID */
+    public function buscarNombreFotografo($idFotografo){
+        $result = false;
+
+        $cons = $this->prepara("SELECT * FROM informacionfotografo WHERE userId = :id");
+        $cons->bindParam(':id', $idFotografo, PDO::PARAM_STR);
+
+        try{
+            $cons->execute();
+            if($cons){
+                $result = $cons->fetch(PDO::FETCH_OBJ);
+            }
+        }catch(PDOException $err){
+            $result = false;
+        }
+        return $result;
+
+    }
 }

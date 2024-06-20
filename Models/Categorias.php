@@ -31,6 +31,7 @@ class Categorias extends BaseDatos{
     public function setNombre(string $nombre){$this->nombre = $nombre;}
 
 
+    /** FUNCION PARA REGISTRAR UNA CATEGORIA */
     public function registro($nombre, $imagen){ 
         $stmt = $this->prepara("INSERT INTO categorias( url, nombre) VALUES( :url, :nombre);");
     
@@ -45,6 +46,7 @@ class Categorias extends BaseDatos{
         }
     }
 
+    /** FUNCION QUE DEVUELVE TODAS LAS CATEGORIAS QUE HAYA EN LA BBDD */
     public function mostrarCategorias(){
         $result = false;
         $categorias = "SELECT * FROM categorias";
@@ -61,6 +63,7 @@ class Categorias extends BaseDatos{
         return $result;
     }
 
+    /** FUNCION QUE SIRVE PARA MOSTRAR EL CONTENIDO DE UNA CATEGORIA EN CONCRETO */
     public function mostrarTipoCategoria($id){
         $result = false;
         $categorias = "SELECT * FROM reportajes where categoriaId = :categoriaId";

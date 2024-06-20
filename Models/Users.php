@@ -40,6 +40,7 @@ class Users extends BaseDatos{
     public function getFotografo():int{return $this->fotografo;}
     public function setFotografo(int $fotografo){$this->fotografo = $fotografo;}
 
+    /** FUNCION PARA HACER EL LOGIN */
     public function login($email){
         $result = false;
         $password = $this->getPassword();
@@ -54,6 +55,7 @@ class Users extends BaseDatos{
         return $result;
     }
 
+    /** FUNCION QUE DEVUELVE EL USUARIO SI EXISTE */
     public function buscaMail($email){
         $result = false;
 
@@ -71,6 +73,7 @@ class Users extends BaseDatos{
         return $result;
     }
 
+    /** FUNCION PARA REGISTRAR USUARIOS */
     public function registro(){ 
         $stmt = $this->prepara("INSERT INTO users( email, password, telefono, nombreUsuario, token,  fotografo) VALUES( :email, :password, :telefono, :nombreUsuario,:token,  :fotografo );");
 
@@ -96,6 +99,7 @@ class Users extends BaseDatos{
         }
     }
 
+    /** FUNCION PARA PODER ACTUALIZAR EL TOKEN DEL USUARIO QUE SERÁ NECESARIO PARA VARIAS FUNCIONALIDADES DE LA PAGINA */
     public function updateToken(){
         $this->consulta("UPDATE users SET token = '$this->token' WHERE email = '$this->email'");
 
@@ -106,6 +110,7 @@ class Users extends BaseDatos{
         }
     }
 
+    /** FUNCION AUXILIAR QUE UTILIZO PARA BUSCAR EN LA TABLA USERS INDEPENDIENTEME DEL CAMPO QUE NECESITE */
     public  function where($columna, $valor){
         $result = false;
 
@@ -126,6 +131,7 @@ class Users extends BaseDatos{
         return $result;
     }
 
+    /** FUNCION PARA OPTIMIZAR CODIGO */
     public function guardar($result){
         if(!is_null($result->id)){
             $this->actualizar($result);
@@ -133,6 +139,7 @@ class Users extends BaseDatos{
         
     }
 
+    /** LAS SIGUIENTES DOS FUNCIONES REALIZAN LA MISMA FUNCIÓN PERO NO TIENEN LOS MISMOS TIPOS DE DATOS, POR ESO DEBO REPETIR EL CODIGO (FIJARSE EN EL PDO::PARAM) */
     public function actualizar($result){
         $resultado = false;
         $cons = $this->prepara("UPDATE users SET verificado = :verificado, token = :token, WHERE id = :id");
@@ -147,23 +154,6 @@ class Users extends BaseDatos{
             $resultado = false;
         }
         return $resultado;
-    }
-
-    public function findId($id){
-        $result = false;
-
-        $cons = $this->prepara("SELECT * FROM users WHERE id = :id");
-        $cons->bindParam(':id', $id, PDO::PARAM_STR);
-
-        try{
-            $cons->execute();
-            if($cons && $cons->rowCount()==1){
-                $result = $cons->fetch(PDO::FETCH_OBJ);
-            }
-        }catch(PDOException $err){
-            $result = false;
-        }
-        return $result;
     }
 
     public function updateConfirmado($usuario){
@@ -183,7 +173,25 @@ class Users extends BaseDatos{
         return $result;
     }
 
+    /** FUNCION QUE NOS PERMITE OBTENER UN USUARIO BUSCANDO POR SU ID */
+    public function findId($id){
+        $result = false;
 
+        $cons = $this->prepara("SELECT * FROM users WHERE id = :id");
+        $cons->bindParam(':id', $id, PDO::PARAM_STR);
+
+        try{
+            $cons->execute();
+            if($cons && $cons->rowCount()==1){
+                $result = $cons->fetch(PDO::FETCH_OBJ);
+            }
+        }catch(PDOException $err){
+            $result = false;
+        }
+        return $result;
+    }
+
+    /** FUNCION QUE NOS PERMITE ACTUALIZAR NUESTRA CONTRASEÑA */
     public function actualizarRecuperacionPassw($usuario){
         $result = false;
         $cons = $this->prepara("UPDATE users SET password = :password, token = :token WHERE id = :id");
@@ -201,6 +209,7 @@ class Users extends BaseDatos{
         return $result;
     }
     
+    /** FUNCION QUE NOS PERMITE REGISTRAR LA INFO DEL FOTOGRAFO */
     public function registrarInfo($data, $imagen){
         $stmt = $this->prepara("INSERT INTO informacionfotografo ( nombre, descripcion, url, userId) VALUES( :nombre, :descripcion, :url, :userId);");
 
@@ -219,7 +228,7 @@ class Users extends BaseDatos{
             return $err;
         }
     }
-
+    /** FUNCION QUE NOS DEVUELVE EL FOTOGRAFO SI EXISTE INFORMACION SOBRE EL*/
     public function existePerfil($id){
         $result = false;
         $cons = $this->prepara("SELECT * FROM informacionfotografo WHERE userId = :userId");
@@ -233,7 +242,7 @@ class Users extends BaseDatos{
         }
         return $result;
     }
-
+    /** FUNCION PARA BUSCAR UN FOTOGRAFO POR SU NOMBRE COMPLETO */
     public function buscarFotografo($nombre){
         $cons = $this->prepara("SELECT * FROM informacionfotografo WHERE nombre = :nombre");
         $cons->bindParam(':nombre', $nombre, PDO::PARAM_STR);
@@ -248,7 +257,7 @@ class Users extends BaseDatos{
     }
 
     
-
+    /** FUNCION PARA BORRAR REGISTROS DE REPORTAJES DEL FOTOGRAFO */
     public function borrarRegistrosReportajesFotografo($idFotografo){
         $cons = $this->prepara("DELETE FROM reportajes WHERE usersId = :usersId");
         $cons->bindParam(':usersId', $idFotografo, PDO::PARAM_INT);
@@ -261,6 +270,7 @@ class Users extends BaseDatos{
         }
     }
 
+    /** FUNCIÓN PARA BORRAR LA INFORMACIÓN DEL FOTOGRAFO */
     public function borrarRegistroInfoFotografo($idFotografo){
         $cons = $this->prepara("DELETE FROM informacionfotografo WHERE userId = :userId");
         $cons->bindParam(':userId', $idFotografo, PDO::PARAM_INT);
@@ -273,6 +283,7 @@ class Users extends BaseDatos{
         }
     }
 
+    /** FUNCION PARA BORRAR EL FOTOGRAFO EN SI */
     public function borrarFotografo($idFotografo){
         $cons = $this->prepara("DELETE FROM users WHERE id = :id");
         $cons->bindParam(':id', $idFotografo, PDO::PARAM_INT);

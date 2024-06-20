@@ -47,19 +47,19 @@ class UsersController{
                             $_SESSION['id'] = $usuario->id;
                             $_SESSION['login'] = true;
                         
-                            if ($usuario->admin == 1 && $usuario->admin != NULL){
+                            if ($usuario->admin == 1 && $usuario->admin != NULL){ //Comprobamos si es admi
                                 $_SESSION['admin'] = true;
                                 header('Location: '.$_ENV['BASE_URL'].'admi/panel');
                                 
-                            }elseif($usuario->fotografo == 1 && $usuario->fotografo !=null){
+                            }elseif($usuario->fotografo == 1 && $usuario->fotografo !=null){ //Comprobamos si es fotografo
                                 $_SESSION['fotografo'] = true;
-                                $perfil = $this->apiUsers->existePerfil($_SESSION['id']);
+                                $perfil = $this->apiUsers->existePerfil($_SESSION['id']); //Buscamos si existe el perfil
 
                                 if(is_object($perfil)){
                                     $_SESSION['reportajes'] = $this->sacarReportajes($perfil->id);
-                                    header('Location: '.$_ENV['BASE_URL']. 'fotografo/perfil/'.$_SESSION['id']);
+                                    header('Location: '.$_ENV['BASE_URL']. 'fotografo/perfil/'.$_SESSION['id']); //Sacamos el perfil del fotografo
                                 }else{
-                                    header('Location: '.$_ENV['BASE_URL']. 'fotografo/nuevo-perfil');
+                                    header('Location: '.$_ENV['BASE_URL']. 'fotografo/nuevo-perfil'); //Sacamos un formulario para que se registren por primera vez los datos de ese fotografo
                                 }
                             }else{
                                 header('Location: '.$_ENV['BASE_URL']);
@@ -128,12 +128,12 @@ class UsersController{
         $alertas = [];
         $id = json_encode($id);
 
-        $usuario = $this->apiUsers->findId($id);
+        $usuario = $this->apiUsers->findId($id); //Busco el usuario por su id
         if(is_object($usuario)){
             $usuario->verificado = 1;
             $usuario->token = null;
             $usuario = json_encode($usuario);
-            $this->apiUsers->confirmacion($usuario);
+            $this->apiUsers->confirmacion($usuario); //Confirmo la cuenta del usuario
 
         }
         $usuario = json_decode($usuario);
@@ -148,17 +148,17 @@ class UsersController{
         if($_SERVER['REQUEST_METHOD'] === 'POST'){
             if(isset($_POST['data'])){
                 $data = $_POST['data'];
-                $alertas = SaneaValida::validaEmail($data['email']);
+                $alertas = SaneaValida::validaEmail($data['email']); //Validamos los datos
 
                 if(empty($alertas)){
                     $data = json_encode($data);
-                    $usuario = $this->apiUsers->existeUsuario($data);
-                    if($usuario->verificado == 1){
-                        $this->apiUsers->crearToken($data);
+                    $usuario = $this->apiUsers->existeUsuario($data); //Comprobamos si existe el usuario
+                    if($usuario->verificado == 1){ //Vemos si está verificado
+                        $this->apiUsers->crearToken($data); //Creamos un token
 
                         if($usuario->token){
                             $email = new Email($usuario->email, $usuario->nombreUsuario, $usuario->id);
-                            $email->enviarInstrucciones();
+                            $email->enviarInstrucciones(); //Enviamos email con instrucciones para restaurar la passw
                         }
                     }
                 }
@@ -167,21 +167,21 @@ class UsersController{
         $this->pages->render('users/olvidePassword', ['alertas' => $alertas]);
     }
 
-
+    /** FUNCION COMPLEMENTARIA A LA ANTERIOR */
     public function recuperar($id){
         $alertas = [];
         if($_SERVER['REQUEST_METHOD'] === 'POST'){
             if(isset($_POST['data'])){
                 $data = $_POST['data'];
-                $alertas = SaneaValida::validaPassword($data['password']);
+                $alertas = SaneaValida::validaPassword($data['password']); //Validamos datos
                 if(empty($alertas)){
                     $id = json_encode($id);
-                    $usuario = $this->apiUsers->findId($id);
+                    $usuario = $this->apiUsers->findId($id); //Buscamos el usuario
                     if(is_object($usuario)){
-                        $usuario->password = password_hash($data['password'], PASSWORD_BCRYPT);
+                        $usuario->password = password_hash($data['password'], PASSWORD_BCRYPT); //Hasheamos la passw
                         $usuario->token = null;
                         $usuario = json_encode($usuario);
-                        $actualizado = $this->apiUsers->actualizarRecuperacionPassw($usuario);
+                        $actualizado = $this->apiUsers->actualizarRecuperacionPassw($usuario); //Actualizo la contraseña
                         if($actualizado){
                             header('Location: '.$_ENV['BASE_URL']. 'login');
                         }
@@ -195,6 +195,7 @@ class UsersController{
         }
     }
 
+    //Cerrar sesion
     public function logout(){
         if($_SESSION['login']){
             unset($_SESSION['nombre']);
@@ -213,6 +214,7 @@ class UsersController{
 
     //Funciones auxiliares
 
+    /** Funcion para comprobar la pass y el verificado de un usuario */
     public function comprobarPasswordAndVerificado($data, $usuario){
         $data = json_decode($data);
         $usuario = json_decode($usuario);
@@ -228,24 +230,26 @@ class UsersController{
 
     /** VAMOS A REALIZAR METODOS DE USUARIO ADMINISTRADOR */
 
+    /** FUNCION QUE RENDERIZA LA VISTA DEL PANEL DE ADMI */
     public function sacarPanelAdmi(){
         $this->pages->render('admi/panel');
     }
 
+    //FUNCION PARA BUSCAR UN FOTOGRAFO
     public function buscarFotografo(){
         if($_SERVER['REQUEST_METHOD'] === 'POST'){
             $data = $_POST['data'];
             $data = json_encode($data);
-            $fotografo = $this->apiUsers->buscarFotografo($data);
+            $fotografo = $this->apiUsers->buscarFotografo($data); //Busco el fotografo
             if(is_object($fotografo)){
-                $this->sacarPerfilFotografo($fotografo->userId);
+                $this->sacarPerfilFotografo($fotografo->userId); //Devuelvo su perfil si lo encuentro
             }else{
-                $this->sacarPanelAdmi();
+                $this->sacarPanelAdmi(); //Sacó el panel de admi ya que no se encuentra el fotografo.
             }
             
         }
     }
-
+    /**FUNCION QUE PERMITE EL BORRADO EN CASCADA DE UN USUARIO */
     public function eliminarFotografo(){
         if($_SERVER['REQUEST_METHOD'] === 'POST'){
             $data = $_POST['data'];
@@ -258,23 +262,23 @@ class UsersController{
             $idFotografo = json_encode($idFotografo);
 
             //Necesitamos buscar registros de reportaje
-            $reportajes = $this->apiReportajes->buscarReportajesFotografo($idFotografo);
+            $reportajes = $this->apiReportajes->buscarReportajesFotografo($idFotografo); //Busca los reportes del fotografo
             
 
             foreach($reportajes as $reportaje){
                 $idReportaje = $reportaje->id;
                 $idReportaje = json_encode($idReportaje);
-                $fotosReportajes = $this->buscarFotosReportaje($idReportaje);
+                $fotosReportajes = $this->buscarFotosReportaje($idReportaje); //Busco las fotos asociadas a ese reportaje
             
                 foreach($fotosReportajes as $fotoReportaje){
                     $imagen = $fotoReportaje->url;
                     $carpetaFotosReportajes = '../public/img/fotosReportaje/';
-                    unlink($carpetaFotosReportajes.$imagen);
+                    unlink($carpetaFotosReportajes.$imagen); //Borra de la carpeta img las imágenes que hay en la carpeta.
                 }
             }
             
             foreach($reportajes as $reportaje){
-                $this->borrarFotosReportajesFotografo($reportaje->id);
+                $this->borrarFotosReportajesFotografo($reportaje->id); //Borro de la BBDD todas las fotos
             }
             
             
@@ -305,24 +309,26 @@ class UsersController{
         }
     }
 
+    //Función para buscar las fotos de un reportaje
     public function buscarFotosReportaje($idReportaje){
         $fotos = $this->apiReportajes->buscarFotosReportaje($idReportaje);
         return $fotos;
     }
 
+    /** FUNCION PARA BORRAR LAS FOTOS DE UN REPORTAJE */
     public function borrarFotosReportajesFotografo($idReportaje){
         $this->apiReportajes->borrarFotosReportajesFotografo($idReportaje);
     }
-
+    /** FUNCION PARA BORRAR LOS REPORTAJES */
     public function borrarRegistrosReportajesFotografo($idFotografo){
         $idFotografo = json_decode($idFotografo);
         $this->apiUsers->borrarRegistrosReportajesFotografo($idFotografo);
     }
-
+    /** FUNCION PARA BORRAR LA INFO DE UN REPORTAJE */
     public function borrarRegistroInfoFotografo($idFotografo){
         $this->apiUsers->borrarRegistroInfoFotografo($idFotografo);
     }
-
+    /** FUNCION PARA BORRAR UN FOTOGRAFO*/
     public function borrarFotografo($idFotografo){
         $idFotografo = json_decode($idFotografo);
         $this->apiUsers->borrarFotografo($idFotografo);
@@ -330,10 +336,11 @@ class UsersController{
 
     /** VAMOS A REALIZAR METODOS DE FOTOGRAFO */
 
+    
     public function sacarInfoFotografo(){
         $this->pages->render('fotografo/info');
     }
-
+    //Función para registrar la info de un fotografo
     public function registrarInfoFotografo(){
         if($_SERVER['REQUEST_METHOD'] === 'POST'){
             if(isset($_POST['data'])){
@@ -353,12 +360,12 @@ class UsersController{
                         mkdir($carpetaImagenesFotografos, 0777, true);
                     }
 
-                    $nombreImagen = md5( uniqid( rand(), true)).'.jpg';
+                    $nombreImagen = md5( uniqid( rand(), true)).'.jpg'; //Creamos nombre único
                     move_uploaded_file($imagen['tmp_name'], $carpetaImagenesFotografos.$nombreImagen);
 
                     $data = json_encode($data); 
                     $url = json_encode($nombreImagen);
-                    $result = $this->apiUsers->registrarInfo($data, $url);
+                    $result = $this->apiUsers->registrarInfo($data, $url); //Registro la info
 
                     if($result){
                         header('Location: '.$_ENV['BASE_URL']. 'fotografo/perfil/'.$_SESSION['id']);
@@ -370,12 +377,14 @@ class UsersController{
         $this->pages->render('fotografo/info', ['alertas' => $alertas]);
     }
 
+    /** FUNCION PARA SACAR EL PERFIL DE UN FOTOGRAFO */
     public function sacarPerfilFotografo($id){
         $perfil = $this->apiUsers->existePerfil($id);
         $_SESSION['reportajes'] = $this->sacarReportajes($id);
         $this->pages->render('fotografo/perfil', ['perfil' => $perfil]);
     }
 
+    /** FUNCION PARA SACAR LOS REPORTAJES DE UN FOTOGRAFO */
     public function sacarReportajes($id){
         $reportajes = $this->apiReportajes->buscarReportajes($id);
         return $reportajes;

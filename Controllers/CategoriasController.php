@@ -15,6 +15,7 @@ class CategoriasController{
         $this->pages = new Pages();
     }
 
+    /** FUNCION PARA REGISTRAR UNA CATEGORIA */
     public function registrar(){
         if($_SERVER['REQUEST_METHOD'] === 'POST'){
             if(isset($_POST['data'])){
@@ -22,7 +23,7 @@ class CategoriasController{
                 $nombre = $data['nombre'];
                 $imagen = $_FILES['imagen'];
 
-                $alertas = SaneaValida::categoria($nombre, $imagen);
+                $alertas = SaneaValida::categoria($nombre, $imagen); //Validamos los datos
                 if(empty($alertas)){
 
                     //Subida de archivos
@@ -34,12 +35,12 @@ class CategoriasController{
                     if(!is_dir($carpetaImagenes)){
                         mkdir($carpetaImagenes, 0777, true);
                     }
-                    $nombreImagen = md5( uniqid( rand(), true)).'.jpg';
-                    move_uploaded_file($imagen['tmp_name'], $carpetaImagenes.$nombreImagen);
+                    $nombreImagen = md5( uniqid( rand(), true)).'.jpg'; //Creamos nombre unico a la imagen
+                    move_uploaded_file($imagen['tmp_name'], $carpetaImagenes.$nombreImagen); //Subimos a la carpeta img 
 
                     $nombre = json_encode($nombre); 
                     $url = json_encode($nombreImagen);
-                    $result = $this->apiCategorias->registrar($nombre, $url);
+                    $result = $this->apiCategorias->registrar($nombre, $url); //Registramos la categoria
                     if($result){
                         $alertas['exito'][] = 'Se ha añadido correctamente la categoria';
                         $this->pages->render('admi/panel', ['alertas' => $alertas]);
@@ -51,11 +52,13 @@ class CategoriasController{
         $this->pages->render('admi/panel', ['alertas' => $alertas]);
     }
 
+    /** FUNCION QUE NOS PERMITE MOSTRAR TODAS LAS CATEGORIAS */
     public function mostrarCategorias(){
         $categorias = $this->apiCategorias->mostrarCategorias();
         return $categorias;
     }
 
+    /** FUNCION PARA MOSTRAR EL CONTENIDO DE UNA CATEGORIA */
     public function mostrarTipoCategoria($id){
         $_SESSION['categoriaId'] = $id;
         $id = json_encode($id);
