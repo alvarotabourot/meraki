@@ -34,6 +34,7 @@ class UsersController{
                     $data = json_encode($data);
                     //Compruebo si existe el usuario buscando en la BBDD por su email
                     $usuario = $this->apiUsers->existeUsuario($data);
+                    
 
                     if(is_object($usuario)){
                         $usuario = json_encode($usuario);
@@ -70,6 +71,9 @@ class UsersController{
                             $alertas['error'][] = 'La contraseña es incorrecta o la cuenta no está verificada.';
                             $this->pages->render('users/login', ['alertas' => $alertas]);
                         }
+                    }else{
+                        $alertas['error'][] = 'No tiene una cuenta asociada a ese email, registrese primero';
+                        $this->pages->render('users/login', ['alertas' => $alertas]);
                     }
                 }else{
                     $this->pages->render('users/login', ['alertas' => $alertas]);
