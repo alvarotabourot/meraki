@@ -222,6 +222,10 @@ img{
     border-radius: 15px;
 }
 
+.formulario input[type=file]{
+    width: 60%;
+}
+
 
 /** ADMI */
 
@@ -239,7 +243,7 @@ img{
 .container-formulario-admi{
     margin-top: 1.5rem;
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(1, 1fr);
     grid-column-gap: 1rem;
     justify-items: center;
 }
@@ -265,9 +269,19 @@ img{
     border-radius: 5px;
 }
 
+.campo-admi{
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    justify-items: center;
+}
+
 .campo-admi input{
     background-color: #D1CFCC;
     margin-bottom: 1.5rem;
+}
+
+.campo-admi input[type=file]{
+    width: 80%;
 }
 
 .contenido-formulario-admi input[type=submit]{
@@ -317,6 +331,13 @@ img{
 }
 
 /** MENSAJE VERIFICACION **/
+
+.centrar-verificacion{
+	margin-top: 1rem;
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    justify-items: center;
+}
 
 .verificacion{
     display: flex;
@@ -424,16 +445,16 @@ img{
 /** PERFIL FOTOGRAFO **/
 
 .contenedor-centrar-infoPerfil{
-    margin-top: 3rem;
-    margin-bottom: 3rem;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     justify-items: center;
+    height: 40%;
+    align-items: center;
 }
 
 .textoPerfil{
     width: 80%;
-    height: 100%;
+    height: fit-content;
     font-size:x-small;
     background-color: #A7C62C;
     text-align: center;
@@ -446,7 +467,13 @@ img{
 
 .imagenPerfil{
     width: 90%;
-    height: 70%;
+    height: 60%;
+}
+
+.imagenPerfil img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .trabajos-perfil{
@@ -458,11 +485,13 @@ img{
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-bottom: 4rem;
 }
 
 .contenedor-reportaje{
     width: 100px;
     height: 150px;
+    
 }
 
 .contenedor-reportaje img{
@@ -531,6 +560,7 @@ img{
 		border-radius: 15px;
 		width: 100%;
 		height: 100%;
+		object-fit: cover;
 	}
 .flip-card a {
 		color: #010101;
@@ -538,6 +568,11 @@ img{
 		text-decoration: none;
 		font-weight: bold;
 		padding: 10px;
+		width: 100%;
+}
+
+.flip-card h2{
+	text-align: center;
 }
 .flip-card:hover .flip-card-inner{
     transform: rotateY(180deg);	
@@ -656,7 +691,7 @@ img{
 }
 
 .transition{
-    transform: scale(1.8);
+    transform: scale(1.2);
 }
 
 .form-fotoReportaje{
@@ -712,7 +747,6 @@ img{
 
     .categorias{
         grid-template-columns: repeat(3, 1fr);
-        grid-template-rows: repeat(2, 1fr);
     }
 
     .categoria{
@@ -750,12 +784,8 @@ img{
         grid-template-columns: repeat(3, 1fr);
     }
 
-    .transition{
-        transform: scale(1.4);
-    }
     .textoPerfil{
         width: 80%;
-        height: 100%;
         font-size: medium;
     }
 
@@ -771,12 +801,25 @@ img{
     .acciones{
         flex-direction: row;
     }
+
+    .transition{
+        transform: scale(1.8);
+    }
 }
 
 @media (min-width: 1024px){
+
+    .container-formulario-admi{
+        margin-top: 1.5rem;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-column-gap: 1rem;
+        justify-items: center;
+    }
+
     .flip-card{
-        width: 50%;
-	    height: 250px;
+        width: 65%;
+	    height: 275px;
     }
 
     .centrar-reportajes{
@@ -786,13 +829,8 @@ img{
     .contenido-fotos-reportaje{
         grid-template-columns: repeat(5, 1fr);
     }
-
-    .transition{
-        transform: scale(1.6);
-    }
     .textoPerfil{
         width: 80%;
-        height: 80%;
         font-size: large;
     }
 
